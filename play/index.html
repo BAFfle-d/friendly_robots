@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#153fd0">
+<title>Rex Runs RoboTown | FRIENDLY ROBOTS!</title>
+<meta name="description" content="Help Rex dash across RoboTown to his best friend, Billy. A free FRIENDLY ROBOTS! game for kids, with ten short levels and coloring pages to win.">
+<link rel="canonical" href="https://www.friendlyrobots.online/play">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="FRIENDLY ROBOTS!">
+<meta property="og:title" content="Rex Runs RoboTown | FRIENDLY ROBOTS!">
+<meta property="og:description" content="Help Rex dash across RoboTown to his best friend, Billy. Ten short levels and coloring pages to win.">
+<meta property="og:url" content="https://www.friendlyrobots.online/play">
+<meta property="og:image" content="https://www.friendlyrobots.online/assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/play/play.css">
+</head>
+<body>
+<header class="bar">
+  <a class="home" href="/"><span class="robot-logo" aria-hidden="true">&#8226;&#7447;&#8226;</span>FRIENDLY ROBOTS!</a>
+  <h1>Rex Runs RoboTown</h1>
+  <div class="tools">
+    <button type="button" id="sound-toggle" aria-pressed="true">Sound on</button>
+    <button type="button" id="pause-toggle" hidden>Pause</button>
+  </div>
+</header>
+<main>
+  <div class="stage" id="stage">
+    <canvas id="game" role="img" aria-label="Rex the dog running through RoboTown"></canvas>
+    <p class="hint" id="hint" aria-live="polite"></p>
+    <div class="overlay" id="overlay" aria-live="polite"></div>
+  </div>
+  <div class="controls" id="controls" aria-label="Game controls">
+    <button type="button" class="ctl" id="duck-button" aria-label="Duck">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m-6-6 6 6 6-6"/></svg>Duck
+    </button>
+    <button type="button" class="ctl shield" id="shield-button" aria-label="Shield" hidden>
+      <span class="charge" id="shield-charge" aria-hidden="true"></span>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 4 8 8 9 4-1 8-4 8-9V6l-8-3Z"/></svg>Shield
+    </button>
+    <button type="button" class="ctl jump" id="jump-button" aria-label="Jump">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V6m-6 6 6-6 6 6"/></svg>Jump
+    </button>
+  </div>
+  <p class="keys">Tap the city to jump, or swipe down to duck. On a keyboard: <kbd>Space</kbd> jumps, <kbd>&#8595;</kbd> ducks, <kbd>E</kbd> is the shield, <kbd>P</kbd> pauses.</p>
+  <noscript><p class="keys">Rex Runs RoboTown needs JavaScript turned on to play.</p></noscript>
+</main>
+<footer class="foot">
+  <p>Rex and Billy are best friends from <a href="/#new">Rex and Billy: a FRIENDLY ROBOTS! story</a> by b. floore.</p>
+</footer>
+<script src="/play/engine.js"></script>
+<script src="/play/game.js"></script>
+</body>
+</html>

@@ -20,3 +20,15 @@ Book JSON-LD url stays the clean dp URL. offers.url carries the tag.
 
 NOT UPLOADED
 .vercelignore keeps build.cjs and this README off the public site.
+
+GAME (/play)
+Rex Runs RoboTown lives in play/ and loads only on /play, so the homepage stays light.
+play/engine.js holds the rules: speeds, level lengths, time limits, the shield and
+the obstacle layouts. play/game.js draws everything and handles controls and screens.
+After changing engine.js, run: node play/test-engine.cjs
+That plays every level hundreds of times and fails if a level cannot be cleared
+without bumps, or if a player who never presses anything can still finish.
+The prize coloring pages are play/prizes/*.svg. To use real artwork, add the files
+to play/prizes/ and change the PRIZES list at the top of play/game.js.
+Progress and prizes are saved in the player's own browser (localStorage). The prize
+gate is client-side, so anyone who knows the file address can download the pages.

@@ -49,10 +49,13 @@ canvas{display:block;width:100%;height:100%}
 .ctl.shield svg{fill:#7dd3fc80}
 .ctl .charge{position:absolute;left:0;bottom:0;height:6px;width:100%;background:#38bdf8;transform-origin:left;transition:transform .1s linear}
 .ctl.shield.cooling{color:#6b8aa0}
+.ctl.boost{background:#ffedd5;color:#9a3412;box-shadow:0 5px 0 #fdba74}
+.ctl.boost svg{fill:#fb923c80}
+.ctl.boost.cooling{opacity:.5}
+.power-note{background:#fff3c4;border-radius:12px;padding:6px 10px;font-size:15px}
 .ctl.pressed{transform:translateY(4px);box-shadow:0 1px 0 #b9c7d6}
 .ctl.jump.pressed{box-shadow:0 1px 0 var(--gold-edge)}
 .ctl[hidden]{display:none}
-.controls.two{grid-template-columns:1fr 1.4fr}
 .keys{font-size:13px;text-align:center;color:#4c625e;margin:8px 0}
 kbd{font:inherit;font-weight:900;background:#fff;border:1px solid #c8d2cf;border-radius:5px;padding:0 5px}
 .foot{text-align:center;font-size:13px;padding:6px 16px 18px;color:#4c625e}

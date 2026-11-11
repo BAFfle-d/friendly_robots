@@ -25,6 +25,9 @@ GAME (/play)
 Rex Runs RoboTown lives in play/ and loads only on /play, so the homepage stays light.
 play/engine.js holds the rules: speeds, level lengths, time limits, the shield and
 the obstacle layouts. play/game.js draws everything and handles controls and screens.
+Tuning lives at the top of engine.js: ALLOWED_BUMPS (bumps each board allows before
+the clock runs out), BONK (how long a bump stuns Rex), PHYS (jump height and float),
+PLATFORM heights, and POWERS / POWER_ORDER (power-ups, earned one per board from board 2).
 After changing engine.js, run: node play/test-engine.cjs
 That plays every level hundreds of times and fails if a level cannot be cleared
 without bumps, or if a player who never presses anything can still finish.

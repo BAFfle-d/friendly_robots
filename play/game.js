@@ -26,12 +26,13 @@
   const duckBtn = $('#duck-button');
   const shieldBtn = $('#shield-button');
   const shieldCharge = $('#shield-charge');
+  const boostBtn = $('#boost-button');
   const controls = $('#controls');
   const reduceMotion = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // ---------- Saved progress (this browser only) ----------
   const SAVE_KEY = 'friendlyrobots.rexruns.v1';
-  const blank = () => ({unlocked: 1, best: {}, prizes: {}, muted: false});
+  const blank = () => ({unlocked: 1, best: {}, prizes: {}, powers: {}, muted: false});
   let save = blank();
   try {
     const raw = localStorage.getItem(SAVE_KEY);
@@ -41,6 +42,8 @@
     }
   } catch (e) { /* storage blocked: play without saving */ }
   save.unlocked = Math.min(10, Math.max(1, save.unlocked | 0));
+  if (!save.powers || typeof save.powers !== 'object') save.powers = {};
+  for (const id of Object.keys(save.powers)) if (!E.POWERS[id]) delete save.powers[id];
   const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };
 
   // ---------- Sound: tiny synthesized beeps ----------
@@ -107,7 +110,7 @@
   let finish = null;
   let hintShown = {};
   let hintTimer = 0;
-  const input = {jump: false, duck: false, shield: false};
+  const input = {jump: false, duck: false, shield: false, rocket: false, duckPress: false};
   let duckSources = new Set();
 
   // ---------- Scenery ----------
@@ -234,7 +237,7 @@
       circle(x + m.w / 2, base - m.h * 0.75, m.h * 0.42 + 12, c);
       circle(x + m.w / 2 - 22, base - m.h * 0.55, m.h * 0.28 + 8, c);
       circle(x + m.w / 2 + 24, base - m.h * 0.58, m.h * 0.3 + 8, c);
-      if (m.v > 0.6) { ellipse(x + 10, base - 6, 26, 9, '#7cc4ff'); ellipse(x + 6, base - 12, 5, 4, '#ffd23f'); }
+      if (m.v > 0.6) { circle(x + 4, base - 10, 14, '#4f9f4f'); circle(x + 20, base - 8, 11, '#5cb85c'); }   // a bush (no ground-level water, so it can't look like a puddle)
       return;
     }
     if (key === 'rooftop') {
@@ -285,7 +288,18 @@
 
   // ---------- Characters ----------
   function drawRex(x, y, opts) {
-    const {robo, duck, t, dizzy, shield, blink, air, wag, alpha = 1} = opts;
+    const {robo, duck, t, dizzy, shield, blink, air, wag, alpha = 1, rocket, fast} = opts;
+    if (fast && !reduceMotion) {
+      ctx.save(); ctx.strokeStyle = '#ffffffcc'; ctx.lineWidth = 2.5; ctx.lineCap = 'round';
+      for (let i = 0; i < 4; i++) { const ly = y - 8 - i * 11, lx = x - 8 - ((t * 400 + i * 37) % 40); ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(lx - 22, ly); ctx.stroke(); }
+      ctx.restore();
+    }
+    if (rocket) {
+      const fy = y - (duck ? 15 : 26), fl = 14 + Math.sin(t * 40) * 4;
+      ctx.beginPath(); ctx.moveTo(x + 6, fy - 7); ctx.lineTo(x - fl - 8, fy); ctx.lineTo(x + 6, fy + 7); fill('#fb923c');
+      ctx.beginPath(); ctx.moveTo(x + 6, fy - 4); ctx.lineTo(x - fl * 0.5 - 4, fy); ctx.lineTo(x + 6, fy + 4); fill('#fde047');
+      roundRect(x + 2, fy - 8, 14, 16, 5); fill('#e2e8f0');
+    }
     ctx.save();
     ctx.globalAlpha = alpha * (blink ? 0.45 : 1);
     ctx.translate(x, y);
@@ -427,8 +441,24 @@
     const box = E.obBox(ob, t);
     const x = sx + box.dx, by = GROUND - ob.bottom + box.dy;
     ctx.save();
-    if (ob.hit) ctx.globalAlpha = 0.5;
-    if (ob.glided) ctx.globalAlpha = 0.35;
+    // Each obstacle reacts when Rex bumps into it (or passes with a power-up), then leaves the way.
+    const gone = (ob.hit || ob.glided) ? t - ob.hitAt : -1;
+    if (gone >= 0) {
+      if (gone > 2.4) { ctx.restore(); return; }
+      if (ob.hitBy === 'shield') ctx.globalAlpha = 0.35;
+      else ctx.globalAlpha = Math.max(0, Math.min(1, 2.4 - gone));
+      const g = reduceMotion ? Math.min(gone, 0.4) : gone;
+      const tip = (dir) => { const px = dir > 0 ? x + ob.w : x; ctx.translate(px, by); ctx.rotate(dir * Math.min(1.45, g * 5)); ctx.translate(-px, -by); };
+      switch (ob.kind) {
+        case 'drone': ctx.translate(g * 120, -g * 70 - g * g * 140); break;          // flaps up and away
+        case 'clothesline': ctx.translate(0, -g * 40 - g * g * 230); break;        // helper bots lift the line away
+        case 'roomba': ctx.translate(g * 80 + g * g * 520, 0); break;              // zooms off
+        case 'ducky': ctx.translate(g * 150, -Math.abs(Math.sin(g * 9)) * 18 * Math.max(0, 1 - g / 2)); break; // waddle-hops away
+        case 'pot': case 'cone': case 'basket': tip(1); break;                      // tips over
+        case 'vent': ctx.translate(Math.sin(g * 70) * 2.5 * Math.max(0, 1 - g), 0); break;
+        case 'puddle': break;
+      }
+    }
     switch (ob.kind) {
       case 'puddle':
         ellipse(x + ob.w / 2, GROUND + 3, ob.w / 2 + 4, 8, '#5aa9e6');
@@ -511,11 +541,57 @@
       }
     }
     ctx.restore();
-    if (ob.glided && !reduceMotion) {
-      ctx.globalAlpha = 0.7;
-      star(sx + ob.w / 2 + Math.sin(t * 9) * 10, GROUND - ob.bottom - ob.h / 2, 4, '#7dd3fc');
-      ctx.globalAlpha = 1;
+    if (gone >= 0 && gone < 1.2 && !reduceMotion) {
+      ctx.save(); ctx.globalAlpha = 1 - gone / 1.2;
+      if (ob.kind === 'puddle') {          // splash
+        for (let i = 0; i < 6; i++) { const a = -0.4 - i * 0.45, d = gone * 90; circle(sx + ob.w / 2 + Math.cos(a) * d, GROUND - 6 + Math.sin(a) * d + gone * gone * 160, 3.5, '#7cc4ff'); }
+      } else if (ob.kind === 'vent') {     // big steam puff
+        circle(x + ob.w / 2, by - ob.h - 10 - gone * 40, 10 + gone * 22, '#ffffff');
+      } else if (ob.kind === 'basket') {   // laundry spills out
+        circle(x + ob.w + gone * 50, GROUND - 8, 7, '#f472b6'); circle(x + ob.w + 14 + gone * 70, GROUND - 6, 6, '#60a5fa');
+      } else if (ob.kind === 'pot') {      // flowers roll out
+        circle(x + ob.w + gone * 40, GROUND - 6, 5, '#f472b6'); circle(x + ob.w + 10 + gone * 55, GROUND - 5, 5, '#facc15');
+      }
+      if (ob.hitBy === 'shield') star(sx + ob.w / 2 + Math.sin(t * 9) * 10, GROUND - ob.bottom - ob.h / 2, 4, '#7dd3fc');
+      ctx.restore();
     }
+  }
+
+  // Floating hover-pads Rex can land on.
+  function drawPlatform(p, sx, key) {
+    const top = p.top, w = p.w;
+    const col = p.layer === 2 ? '#8b5cf6' : '#0ea5e9';
+    ctx.save();
+    ctx.globalAlpha = 0.25; ellipse(sx + w / 2, top + 26, w / 2 - 10, 5, '#ffffff'); ctx.globalAlpha = 1;
+    roundRect(sx, top, w, E.PLATFORM.thick, 7); fill(col);
+    roundRect(sx + 4, top + 2, w - 8, 4, 2); fill('#ffffff88');
+    for (let i = 18; i < w - 10; i += 46) { circle(sx + i, top + 17, 4, '#fde68a'); circle(sx + i, top + 21 + Math.sin(anim * 20 + i) * 1.5, 2.5, '#fb923c'); }
+    ctx.restore();
+  }
+
+  // Little pictures for each power-up.
+  function powerIcon(id, x, y, s, c = '#ffffff') {
+    ctx.save(); ctx.translate(x, y); ctx.scale(s, s);
+    ctx.strokeStyle = c; ctx.fillStyle = c; ctx.lineWidth = 2.6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const line = pts => { ctx.beginPath(); pts.forEach(([a, b], i) => i ? ctx.lineTo(a, b) : ctx.moveTo(a, b)); ctx.stroke(); };
+    if (id === 'doublejump') { line([[-6, -1], [0, -7], [6, -1]]); line([[-6, 6], [0, 0], [6, 6]]); }
+    else if (id === 'slide') { line([[-8, 5], [7, 5]]); line([[3, 1], [7, 5], [3, 9]]); circle(-3, -2, 3.2, c); }
+    else if (id === 'rocket') { ctx.beginPath(); ctx.moveTo(0, -9); ctx.quadraticCurveTo(7, -2, 4, 6); ctx.lineTo(-4, 6); ctx.quadraticCurveTo(-7, -2, 0, -9); ctx.fill(); line([[-2, 8], [0, 11], [2, 8]]); }
+    else if (id === 'brace') { ctx.beginPath(); ctx.arc(0, 2, 8, Math.PI, 0); ctx.fill(); ctx.fillRect(-9, 2, 18, 3); }
+    else if (id === 'swim') { line([[-8, -2], [-4, -5], [0, -2], [4, -5], [8, -2]]); line([[-8, 4], [-4, 1], [0, 4], [4, 1], [8, 4]]); }
+    else if (id === 'buddy') heart(0, -6, 14, c);
+    ctx.restore();
+  }
+
+  function drawCapsule(c, sx) {
+    const y = c.y + Math.sin(anim * 3) * 4;
+    ctx.save();
+    ctx.globalAlpha = 0.35 + Math.sin(anim * 6) * 0.1; circle(sx, y, 25, '#fde047'); ctx.globalAlpha = 1;
+    circle(sx, y, 17, '#f97316');
+    ctx.lineWidth = 3; ctx.strokeStyle = '#ffffff'; ctx.beginPath(); ctx.arc(sx, y, 17, 0, Math.PI * 2); ctx.stroke();
+    powerIcon(c.id, sx, y, 1);
+    if (!reduceMotion) for (let i = 0; i < 3; i++) { const a = anim * 2 + i * 2.1; star(sx + Math.cos(a) * 28, y + Math.sin(a) * 28, 3, '#ffffff'); }
+    ctx.restore();
   }
 
   function bolt(x, y, s = 1, spin = 0) {
@@ -591,6 +667,18 @@
     circle(px + pw * p + 2, py + 2.5, 1.6, '#ffffff');
     if (cfg.final) { circle(px + pw, py + 4, 7, '#e0403a'); circle(px + pw, py - 1, 4.5, '#f2c19c'); }
     else { ctx.fillStyle = '#223f3a'; ctx.fillRect(px + pw - 1, py - 6, 2, 18); ctx.fillStyle = '#ffcf00'; ctx.fillRect(px + pw + 1, py - 6, 9, 7); }
+    // Power-ups Rex has: bright while ready on this board, grey once used.
+    let bx = 22;
+    for (const id of E.POWER_ORDER) {
+      if (!run.owned.has(id)) continue;
+      const ready = !run.used.has(id);
+      ctx.globalAlpha = ready ? 1 : 0.55;
+      circle(bx, 76, 12, ready ? '#f97316' : '#94a3b8');
+      powerIcon(id, bx, 76, 0.75);
+      if (!ready) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(bx - 7, 83); ctx.lineTo(bx + 7, 69); ctx.stroke(); }
+      bx += 29;
+    }
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
   function pill(x, y, w, h, bg) { roundRect(x, y, w, h, h / 2); fill(bg || '#fffbedee'); }
@@ -622,6 +710,13 @@
     const billyX = cfg.distance + REX_X + 300;
     const hugging = finish && finish.hug > 0;
     if (cfg.final) { const sx = billyX - scroll; if (sx < W + 40) drawBilly(sx, GROUND, anim, hugging); }
+    // platforms
+    for (const p of run.platforms) {
+      const sx = p.x - scroll;
+      if (sx > W + 20 || sx + p.w < -20) continue;
+      drawPlatform(p, sx, cfg.theme.key);
+    }
+    if (run.capsule && !run.capsule.got) { const sx = run.capsule.x - scroll; if (sx > -40 && sx < W + 40) drawCapsule(run.capsule, sx); }
     // bolts
     for (const b of run.bolts) {
       if (b.got) continue;
@@ -642,9 +737,9 @@
     const rexX = REX_X + (finish ? finish.rexDx : 0);
     const rexY = hugging ? GROUND - 24 - Math.abs(Math.sin(finish.hug * 7)) * 5 * Math.max(0, 1 - finish.hug) : run.y;
     drawRex(rexX, rexY, {
-      robo: cfg.robo, duck: run.duck, t: anim, air: !run.ground, dizzy,
+      robo: cfg.robo, duck: run.duck || run.slideLeft > 0, t: anim, air: !run.ground, dizzy,
       shield: run.shieldOn > 0, blink: run.safe > 0 && !dizzy && Math.floor(anim * 10) % 2 === 0,
-      wag: !!finish
+      wag: !!finish, fast: run.slideLeft > 0 || run.rocketLeft > 0, rocket: run.rocketLeft > 0
     });
     if (hugging) drawHugArm(billyX - scroll, GROUND);
     drawFx(dt);
@@ -659,6 +754,16 @@
   }
   function checkHints() {
     const cfg = run.cfg;
+    const ahead = x => x - run.x - REX_X;
+    const c = run.capsule;
+    if (c && !c.got && !hintShown.capsule && ahead(c.x) < 420 && ahead(c.x) > 0) { hintShown.capsule = true; showHint('A power-up! Jump to catch it!'); return; }
+    const p = run.platforms.find(q => ahead(q.x) < 380 && ahead(q.x) > 0);
+    if (p && !hintShown['plat' + p.layer] && !save.seenPlatform) {
+      hintShown['plat' + p.layer] = true;
+      showHint(p.layer === 1 ? 'Hop up on the platform! Press Duck to drop back down.' : 'Jump from the first platform to reach the top one!');
+      if (p.layer === 2 || cfg.level > 6) { save.seenPlatform = true; persist(); }
+      return;
+    }
     const near = run.obstacles.find(o => !o.hit && !o.glided && o.x - run.x - REX_X < 330 && o.x - run.x - REX_X > 0);
     if (!near) return;
     const key = cfg.level + ':' + near.pass;
@@ -681,13 +786,14 @@
     if (mode === 'play') {
       acc += dt;
       while (acc >= STEP && mode === 'play') {
-        E.step(run, STEP, {jump: input.jump, duck: input.duck, shield: input.shield});
-        input.jump = false; input.shield = false;
+        E.step(run, STEP, {jump: input.jump, duck: input.duck || input.duckPress, duckPress: input.duckPress, shield: input.shield, rocket: input.rocket});
+        input.jump = false; input.shield = false; input.rocket = false; input.duckPress = false;
         acc -= STEP;
         handleEvents();
       }
       checkHints();
       updateShieldButton();
+      updateBoostButton();
     } else if (mode === 'finish') {
       stepFinish(dt);
     } else if (!run) {
@@ -710,10 +816,28 @@
       }
       else if (e === 'shield') sfx.shield();
       else if (e === 'glide') { sfx.glide(); addFx({text: 'whoosh!', x: rx + 30, y: run.y - 70, life: 0.8, color: '#0284c7'}); }
+      else if (e === 'doublejump') { sfx.jump(); tone(700, 1100, 0.12, 'square', 0.04, 0.03); addFx({star: true, x: rx, y: run.y - 10, life: 0.6, rise: -20, size: 6}); }
+      else if (e === 'slide') { sfx.shield(); addFx({text: 'zoom!', x: rx + 30, y: run.y - 50, life: 0.8, color: '#ea580c'}); }
+      else if (e === 'rocket') { sfx.shield(); tone(200, 600, 0.5, 'sawtooth', 0.04); addFx({text: 'blast off!', x: rx + 40, y: run.y - 70, life: 0.9, color: '#ea580c'}); }
+      else if (e === 'brace') { sfx.glide(); addFx({text: 'braced!', x: rx + 30, y: run.y - 70, life: 0.9, color: '#ea580c'}); }
+      else if (e === 'swim') { sfx.glide(); addFx({text: 'splish splash!', x: rx + 30, y: run.y - 60, life: 0.9, color: '#0284c7'}); }
+      else if (e === 'buddy') { sfx.glide(); addFx({text: 'hi, buddy!', x: rx + 30, y: run.y - 70, life: 0.9, color: '#db2777'}); addFx({heart: true, x: rx + 40, y: run.y - 50, life: 1, rise: 40}); }
+      else if (e === 'drop') sfx.duck();
+      else if (e === 'power') gotPower(run.got);
       else if (e === 'finish') startFinish();
       else if (e === 'late') { sfx.late(); showResult(); }
     }
     run.events.length = 0;
+  }
+
+  // A power-up is Rex's to keep for the rest of the game as soon as he catches it.
+  function gotPower(id) {
+    if (!id) return;
+    if (!save.powers[id]) { save.powers[id] = run.cfg.level; persist(); }
+    sfx.finish();
+    for (let i = 0; i < 6; i++) addFx({star: true, x: REX_X + 10 + i * 12, y: run.y - 60, life: 1, rise: 50, size: 6, color: '#fde047'});
+    showHint(`You got ${E.POWERS[id].name}! ${E.POWERS[id].how}`, 4.5);
+    setControls(run.cfg.robo);
   }
 
   function startFinish() {
@@ -783,12 +907,16 @@
       return `<button class="tile${cfg.robo ? ' robo' : ''}" data-act="play" data-level="${n}" ${locked ? 'disabled aria-label="Level ' + n + ', locked"' : 'aria-label="Level ' + n + ', ' + cfg.theme.name + (best ? ', ' + best.stars + ' stars' : '') + '"'}>${n}<small>${cfg.theme.name}</small><span class="mini">${locked ? 'locked' : s}</span></button>`;
     };
     const prizes = [5, 10].filter(n => save.prizes[n]).map(prizeBlock).join('');
+    const owned = E.POWER_ORDER.filter(id => save.powers[id]);
+    const nextPower = E.POWER_ORDER.find(id => !save.powers[id]);
+    const powersLine = `<p class="power-note">${owned.length ? 'Your power-ups: <b>' + owned.map(id => E.POWERS[id].name).join(', ') + '</b>.' : 'Power-ups start hiding on level 2.'}${nextPower && owned.length ? ' Next to find: ' + E.POWERS[nextPower].name + '.' : ''}</p>`;
     openOverlay(`
       <h2>Choose a level</h2>
       <div class="levels">
         <h3>Rex the dog</h3>${[1, 2, 3, 4, 5].map(tile).join('')}
         <h3>Rex the Doggotron${save.unlocked < 6 ? ' (reach Billy to unlock)' : ''}</h3>${[6, 7, 8, 9, 10].map(tile).join('')}
       </div>
+      ${powersLine}
       ${prizes}
       <div class="actions">
         <button class="btn plain" data-act="menu" data-primary>Back</button>
@@ -803,7 +931,8 @@
 
   function showIntro(n) {
     level = n;
-    run = E.createRun(n);
+    const offer = E.offerFor(n, save.powers);
+    run = E.createRun(n, undefined, {powers: Object.keys(save.powers), offer});
     finish = null; fx = [];
     mode = 'intro';
     hintShown = {};
@@ -818,10 +947,16 @@
     if (cfg.final) tip = 'Billy is at the end of this street!';
     if (cfg.level === 6) tip = 'Rex is the Doggotron now! Tap Shield to glide right through one obstacle. It needs a little time to charge again.';
     else if (cfg.robo) tip += ' Your shield can glide through one obstacle at a time.';
+    const owned = E.POWER_ORDER.filter(id => save.powers[id]);
+    const powerLine = offer
+      ? `<p class="power-note"><b>A power-up is hiding on this board:</b> ${E.POWERS[offer].name}! Jump to catch the glowing capsule.</p>`
+      : '';
+    const ownedLine = owned.length ? `<p class="power-note">Your power-ups, once each this board: ${owned.map(id => E.POWERS[id].name).join(', ')}.</p>` : '';
+    const platformLine = cfg.platforms && n === 1 ? ' Hop up onto the floating platforms, and press Duck to drop down.' : (n === 6 ? ' Some platforms have a second floor now. Jump to it from the first one.' : '');
     openOverlay(`
       <div class="eyebrow">Level ${n} of 10${cfg.robo ? ' &middot; Doggotron' : ''}</div>
       <h2>${cfg.theme.name}</h2>
-      <p>${tip}</p>
+      <p>${tip}${platformLine}</p>${powerLine}${ownedLine}
       <p><b>Reach ${cfg.final ? 'Billy' : 'the finish'} by ${fmt(cfg.limit)}.</b> Each bump costs a little time.</p>
       <div class="actions"><button class="btn gold" data-act="go" data-primary>Go, Rex!</button><button class="btn plain" data-act="levels">Levels</button></div>`);
   }
@@ -830,7 +965,7 @@
     closeOverlay();
     mode = 'play';
     acc = 0;
-    input.jump = false; input.shield = false;
+    input.jump = false; input.shield = false; input.rocket = false; input.duckPress = false;
     pauseBtn.hidden = false; pauseBtn.textContent = 'Pause';
     stage.focus && stage.focus({preventScroll: true});
   }
@@ -843,8 +978,9 @@
       openOverlay(`
         <div class="eyebrow">Level ${cfg.level}</div>
         <h2>Billy is still waiting!</h2>
-        <p>Rex needs to get there by ${fmt(cfg.limit)}. Each bump costs about a second and a half, so try hopping a little earlier.</p>
+        <p>Rex needs to get there by ${fmt(cfg.limit)}. Each bump costs about two seconds, and this board allows ${cfg.allowed}. Try hopping a little earlier.</p>
         <div class="stats"><span><b>${run.bonks}</b>bumps</span><span><b>${run.boltsGot}</b>bolts</span></div>
+        ${run.got ? `<p class="power-note">You still keep your new power-up: <b>${E.POWERS[run.got].name}</b>.</p>` : ''}
         <div class="actions"><button class="btn gold" data-act="play" data-level="${cfg.level}" data-primary>Try again</button><button class="btn plain" data-act="levels">Levels</button></div>`);
       return;
     }
@@ -870,6 +1006,7 @@
       <h2>${title}</h2>
       ${starRow(st)}
       <div class="stats"><span><b>${fmt(run.finishTime)}</b>time${newBest && prev ? ' (best!)' : ''}</span><span><b>${run.boltsGot}</b>bolts</span><span><b>${sc}</b>score</span></div>
+      ${run.got ? `<p class="power-note">New power-up for the rest of the game: <b>${E.POWERS[run.got].name}</b>. ${E.POWERS[run.got].how}</p>` : ''}
       ${st < 3 ? `<p>${st === 2 ? 'Three stars means no bumps at all. Can you do it?' : 'Fewer bumps means more stars.'}</p>` : ''}
       ${prizeLevel ? `<p><b>${cfg.level === 10 ? 'You finished every level of Rex Runs RoboTown!' : 'You finished the first five levels!'}</b>${firstPrize ? ' You won a prize:' : ''}</p>${prizeBlock(prizeLevel)}` : ''}
       <div class="actions">${nextBtn}<button class="btn plain" data-act="play" data-level="${cfg.level}">Play again</button><button class="btn plain" data-act="levels">Levels</button></div>`);
@@ -910,8 +1047,16 @@
 
   // ---------- Controls ----------
   function setControls(robo) {
+    const boost = !!(run ? run.owned.has('rocket') : save.powers.rocket);
     shieldBtn.hidden = !robo;
-    controls.classList.toggle('two', !robo);
+    boostBtn.hidden = !boost;
+    controls.style.gridTemplateColumns = ['1fr', robo ? '1fr' : '', boost ? '1fr' : '', '1.4fr'].filter(Boolean).join(' ');
+  }
+  function updateBoostButton() {
+    if (!run) return;
+    const spent = run.used.has('rocket');
+    boostBtn.classList.toggle('cooling', spent);
+    boostBtn.setAttribute('aria-label', spent ? 'Boost, used on this board' : 'Boost');
   }
   function updateShieldButton() {
     if (!run || !run.cfg.shield) return;
@@ -925,8 +1070,10 @@
     if (mode !== 'play') return;
     if (kind === 'jump') input.jump = true;
     if (kind === 'shield') input.shield = true;
+    if (kind === 'rocket') input.rocket = true;
   }
-  function duckOn(src) { duckSources.add(src); input.duck = true; }
+  // Each new press of Duck counts on its own, so tap then tap starts a slide even if both happen between frames.
+  function duckOn(src) { if (!duckSources.has(src)) input.duckPress = mode === 'play'; duckSources.add(src); input.duck = true; }
   function duckOff(src) { duckSources.delete(src); input.duck = duckSources.size > 0; }
 
   function bindButton(btn, down, up) {
@@ -946,13 +1093,14 @@
   }
   bindButton(jumpBtn, () => press('jump'));
   bindButton(shieldBtn, () => press('shield'));
+  bindButton(boostBtn, () => press('rocket'));
   bindButton(duckBtn, () => duckOn('button'), () => duckOff('button'));
 
   // Tap the city to jump. Swipe down on it to duck.
   let swipe = null;
   canvas.addEventListener('pointerdown', e => {
     e.preventDefault();
-    swipe = {id: e.pointerId, y: e.clientY, ducking: false};
+    swipe = {id: e.pointerId, y: e.clientY, ducking: false, from: run ? {y: run.y, plat: run.plat, ground: run.ground, jumpFrom: run.jumpFrom, jumps: run.jumps} : null};
     try { canvas.setPointerCapture(e.pointerId); } catch (er) { /* ignore */ }
     if (mode === 'intro') { go(); return; }
     press('jump');
@@ -963,7 +1111,10 @@
       swipe.ducking = true;
       input.jump = false;
       // undo a hop that only just started, so a swipe down is a duck and not a jump
-      if (!run.ground && run.vy < -E.PHYS.jump * 0.7) { run.vy = 0; run.y = GROUND; run.ground = true; }
+      const f = swipe.from;
+      if (f && f.ground && run.jumps > f.jumps && !run.ground && run.vy < -E.PHYS.jump * 0.7) {
+        Object.assign(run, {vy: 0, y: f.y, plat: f.plat, ground: true, jumpFrom: f.jumpFrom});
+      }
       duckOn('swipe');
     }
   });
@@ -975,6 +1126,7 @@
   const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'];
   const DUCK_KEYS = ['ArrowDown', 'KeyS'];
   const SHIELD_KEYS = ['KeyE', 'KeyX', 'ShiftLeft', 'ShiftRight'];
+  const BOOST_KEYS = ['KeyR', 'KeyQ'];
   window.addEventListener('keydown', e => {
     const playing = mode === 'play';
     if ((e.code === 'KeyP' || e.code === 'Escape') && (playing || mode === 'paused')) { e.preventDefault(); playing ? pause() : resume(); return; }
@@ -985,6 +1137,7 @@
     if (JUMP_KEYS.includes(e.code)) { e.preventDefault(); if (!e.repeat) press('jump'); }
     else if (DUCK_KEYS.includes(e.code)) { e.preventDefault(); duckOn('key:' + e.code); }
     else if (SHIELD_KEYS.includes(e.code)) { e.preventDefault(); if (!e.repeat) press('shield'); }
+    else if (BOOST_KEYS.includes(e.code)) { e.preventDefault(); if (!e.repeat) press('rocket'); }
   });
   window.addEventListener('keyup', e => { if (DUCK_KEYS.includes(e.code)) duckOff('key:' + e.code); });
 

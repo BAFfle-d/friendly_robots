@@ -1070,7 +1070,12 @@
     if (mode !== 'play') return;
     if (kind === 'jump') input.jump = true;
     if (kind === 'shield') input.shield = true;
-    if (kind === 'rocket') input.rocket = true;
+    if (kind === 'rocket') {
+      // Say why nothing happens, instead of failing silently.
+      if (!run.owned.has('rocket')) showHint('Boost is a power-up. Catch the Rocket boost capsule on a later board to use it!', 3);
+      else if (run.used.has('rocket')) showHint('Boost already used on this board. It comes back on the next one.', 2.5);
+      else input.rocket = true;
+    }
   }
   // Each new press of Duck counts on its own, so tap then tap starts a slide even if both happen between frames.
   function duckOn(src) { if (!duckSources.has(src)) input.duckPress = mode === 'play'; duckSources.add(src); input.duck = true; }
@@ -1126,7 +1131,7 @@
   const JUMP_KEYS = ['Space', 'ArrowUp', 'KeyW'];
   const DUCK_KEYS = ['ArrowDown', 'KeyS'];
   const SHIELD_KEYS = ['KeyE', 'KeyX', 'ShiftLeft', 'ShiftRight'];
-  const BOOST_KEYS = ['KeyR', 'KeyQ'];
+  const BOOST_KEYS = ['KeyR', 'KeyQ', 'ArrowRight', 'KeyD'];
   window.addEventListener('keydown', e => {
     const playing = mode === 'play';
     if ((e.code === 'KeyP' || e.code === 'Escape') && (playing || mode === 'paused')) { e.preventDefault(); playing ? pause() : resume(); return; }

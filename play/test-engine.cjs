@@ -5,6 +5,7 @@
 // 3. One bump costs what BONK_COST says, and the allowed bumps on each board just beat the clock.
 // 4. Jump presses near the ground never spend the double jump.
 // 5. Layer-2 platforms can only be reached from layer 1.
+// 6. The rocket boost fires only once caught, once per board, and waits out a dizzy spell.
 // It also prints how a sloppy player does (timing off by up to 0.2 s, or JITTER=0.3 node play/test-engine.cjs).
 const fs = require('node:fs');
 const path = require('node:path');
@@ -101,6 +102,35 @@ for (const level of [1, 5, 10]) {
   for (let i = 0; i < 20; i++) tick();
   tick({jump: true});                            // high in the air: this one is the double jump
   check(run.used.has('doublejump') && run.vy < -E.PHYS.jump * 0.95, 'a press high in the air should be the double jump, at full strength');
+}
+
+// 6. Rocket boost: does nothing until caught, fires once per board, and a press while dizzy fires when Rex is up again.
+{
+  const tick = (run, input = {}) => { E.step(run, DT, input); run.events.length = 0; };
+  const fresh = owned => { const r = E.createRun(4, 3, {powers: owned}); r.obstacles.length = 0; for (let i = 0; i < 120; i++) tick(r); return r; };
+  const none = fresh([]);
+  tick(none, {rocket: true});
+  for (let i = 0; i < 10; i++) tick(none);
+  check(none.rocketLeft <= 0 && none.speed === none.cfg.speed, 'boost must not fire before Rocket boost is caught');
+  const has = fresh(['rocket']);
+  tick(has, {rocket: true});
+  for (let i = 0; i < 10; i++) tick(has);
+  check(has.rocketLeft > 0 && has.speed > has.cfg.speed * 1.5, 'boost should fire once Rocket boost is caught');
+  for (let i = 0; i < 400; i++) tick(has);
+  tick(has, {rocket: true});
+  for (let i = 0; i < 10; i++) tick(has);
+  check(has.rocketLeft <= 0, 'boost should only work once per board');
+  const dizzy = fresh(['rocket']);
+  dizzy.bonk = {t: 0.3, kind: 'cone'};
+  tick(dizzy, {rocket: true});
+  check(dizzy.rocketLeft <= 0, 'boost waits while Rex is dizzy');
+  for (let i = 0; i < 120 * 1.3 && dizzy.rocketLeft <= 0; i++) tick(dizzy);
+  check(dizzy.rocketLeft <= 0, 'a press more than 0.6 s before Rex recovers should lapse');
+  const soon = fresh(['rocket']);
+  soon.bonk = {t: E.BONK.knock + E.BONK.dizzy - 0.3, kind: 'cone'};
+  tick(soon, {rocket: true});
+  for (let i = 0; i < 120 && soon.rocketLeft <= 0; i++) tick(soon);
+  check(soon.rocketLeft > 0, 'a boost pressed just before Rex recovers should fire when he is up');
 }
 
 // 5. Layer 2 needs layer 1.

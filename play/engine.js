@@ -205,7 +205,7 @@
       bonk: null, safe: 0,
       shieldOn: 0, shieldCd: 0,
       owned: new Set(opts.powers || []), used: new Set(), got: null,
-      slideLeft: 0, rocketLeft: 0, airJumps: 0,
+      slideLeft: 0, rocketLeft: 0, rocketWant: 0, airJumps: 0,
       boltsGot: 0, bonks: 0, glides: 0, jumps: 0,
       state: 'run', finishTime: 0, events: []
     };
@@ -306,8 +306,11 @@
       run.shieldCd = SHIELD.cooldown;
       ev.push('shield');
     }
-    if (input.rocket && run.owned.has('rocket') && !run.used.has('rocket') && !dizzy) {
-      run.used.add('rocket'); run.rocketLeft = ROCKET.time; ev.push('rocket');
+    // A boost pressed while Rex is still dizzy waits a moment and fires once he is up again.
+    if (input.rocket) run.rocketWant = 0.6;
+    else if (run.rocketWant > 0) run.rocketWant -= dt;
+    if (run.rocketWant > 0 && run.owned.has('rocket') && !run.used.has('rocket') && !dizzy) {
+      run.used.add('rocket'); run.rocketLeft = ROCKET.time; run.rocketWant = 0; ev.push('rocket');
     }
 
     // Walking off the end of a platform

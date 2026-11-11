@@ -1,36 +1,22 @@
-FRIENDLY ROBOTS! WEBSITE
+FRIENDLY ROBOTS!
 
-OPEN THE WEBSITE
-1. Extract this ZIP into a folder.
-2. Open index.html in Chrome, Edge, Firefox, or Safari.
-No installation or build is needed to open the finished website.
+The live site is the static files at the repository root. Vercel serves them
+as-is (no build command, framework null). index.html is the homepage.
 
-WHAT IS INCLUDED
-index.html - the finished homepage, with its illustration, styles, and scripts embedded.
-assets/robotown.jpg - the current RoboTown illustration as a separate image file.
-styles.css - editable page styling.
-catalog.js - the nine books, cover links, descriptions, and overlapping categories.
-app.js - book previews, RoboTown discoveries, category filters, hidden stars, and display controls.
-friend.js - "Make a robot friend": the robot parts, crayons, wake-up, flight home, and printable coloring page.
-page.html - editable page structure.
-build.cjs - optional tool for rebuilding index.html after editing the source files.
+EDITING
+index.html is the page, including metadata and JSON-LD.
+styles.css, catalog.js, app.js, and friend.js are the other editable sources.
+assets/robotown.webp is the hero image. assets/robotown.jpg is the fallback.
+assets/og.jpg is the 1200x630 share image.
 
-INTERNET CONNECTION
-Book covers load from Amazon and the Fredoka/Nunito fonts load from Google Fonts.
-These need an internet connection. The page has built-in fallback fonts.
-The RoboTown illustration and all interactive code are included in this ZIP.
-Amazon book links and the original WordPress site also require internet access.
+After changing a book in catalog.js, run: node build.cjs
+That refreshes the Book JSON-LD in index.html and checks links, categories,
+and required copy. Commit the updated index.html. Vercel does not run the script.
 
-PUBLISHING
-Upload the contents of this folder to a static website host, with index.html at the root.
-This package contains no login credentials and does not require a database or server application.
+AMAZON
+Product and author-store links use tag=stashandset-20, the Associates tracking
+ID confirmed from reviews.bfloore.online. The page discloses that relationship.
+Book JSON-LD url stays the clean dp URL. offers.url carries the tag.
 
-ROBOT FRIENDS
-Each visitor's robot friend is remembered only in their own browser (localStorage).
-Nothing is sent anywhere. Clearing site data, or a private window, starts with a fresh robot.
-
-EDITING (OPTIONAL)
-Edit page.html, styles.css, catalog.js, app.js, or friend.js.
-With Node.js installed, run: node build.cjs
-This rebuilds index.html from those files and the RoboTown illustration.
-The included build command checks the site's links, categories, and required content.
+NOT UPLOADED
+.vercelignore keeps build.cjs and this README off the public site.

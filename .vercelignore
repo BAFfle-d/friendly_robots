@@ -1,0 +1,6 @@
+# This project deploys as static files with no build step.
+# Ignored paths stay in git for editing and are not uploaded or served.
+friendly-robots/
+build.cjs
+README.txt
+page.html

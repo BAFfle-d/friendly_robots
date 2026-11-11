@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Friendly Robots">
+  <rect width="32" height="32" rx="8" fill="#ffcf00"/>
+  <rect x="1.35" y="1.35" width="29.3" height="29.3" rx="6.9" fill="none" stroke="#ffffff" stroke-width="1.7"/>
+  <circle cx="11" cy="13.1" r="2.35" fill="#152a84"/>
+  <circle cx="21" cy="13.1" r="2.35" fill="#152a84"/>
+  <path d="M9.8 19.15c2.45 3.55 9.95 3.55 12.4 0" fill="none" stroke="#152a84" stroke-width="2.05" stroke-linecap="round"/>
+</svg>

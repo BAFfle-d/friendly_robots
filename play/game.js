@@ -994,7 +994,10 @@
 
   // ---------- Start ----------
   resize();
-  showMenu();
+  // Review shortcut for preview links only: /play?level=7 opens level 7 straight away.
+  // It does nothing on the live site.
+  const reviewLevel = /\.vercel\.app$|^localhost$|^127\.0\.0\.1$/.test(location.hostname) && +new URLSearchParams(location.search).get('level');
+  if (reviewLevel >= 1 && reviewLevel <= 10) showIntro(Math.floor(reviewLevel)); else showMenu();
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => draw());
   requestAnimationFrame(frame);
 })();

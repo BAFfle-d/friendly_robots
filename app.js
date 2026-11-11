@@ -20,7 +20,7 @@
     const content=document.querySelector('#dialog-content');
     if(target.dataset.book){
       const book=byId.get(target.dataset.book);if(!book)return;
-      content.innerHTML=`<div class="dialog-layout" style="--book-color:${book.color}"><div class="dialog-art">${cover(book,false)}</div><div class="dialog-copy"><span class="tag">${book.categories.map(c=>esc(categories[c])).join(' &middot; ')}</span><h2 id="dialog-title">${esc(book.title)}</h2><p>${esc(book.description)}</p><a class="button" href="${esc(book.url)}" target="_blank" rel="noopener">Find this book on Amazon &#8599;</a><small>Opens Amazon in a new tab. Ask a grown-up to join you.</small></div></div>`;
+      content.innerHTML=`<div class="dialog-layout" style="--book-color:${book.color}"><div class="dialog-art">${cover(book,false)}</div><div class="dialog-copy"><span class="tag">${book.categories.map(c=>esc(categories[c])).join(' &middot; ')}</span><h2 id="dialog-title">${esc(book.title)}</h2><p>${esc(book.description)}</p><a class="button" href="${esc(book.url)}" target="_blank" rel="noopener sponsored">Find this book on Amazon &#8599;</a><small>Opens Amazon in a new tab. Ask a grown-up to join you. As an Amazon Associate I earn from qualifying purchases.</small></div></div>`;
     }else{
       const place=places[target.dataset.place];if(!place)return;
       const symbols={tower:'&#8962;',duck:'&#129414;',park:'&#10047;'};

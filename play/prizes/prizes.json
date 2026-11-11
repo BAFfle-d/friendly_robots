@@ -1,0 +1,7 @@
+{
+  "about": "Coloring-page prizes. Each pack unlocks after the level in 'after'. 'pages' lists page numbers in play/prizes/pages/, shown in this order. After changing pages, rebuild the PDFs with: python3 play/prizes/make_prizes.py",
+  "packs": [
+    {"after": 5, "title": "Your first prize!", "name": "Rex and Billy coloring pack", "pdf": "rex-and-billy-pack-1.pdf", "pages": [10, 1, 2, 3, 5]},
+    {"after": 10, "title": "Your Doggotron prize!", "name": "Rex the Doggotron coloring pack", "pdf": "rex-and-billy-pack-2.pdf", "pages": [8, 4, 6, 7, 9]}
+  ]
+}

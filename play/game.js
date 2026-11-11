@@ -7,12 +7,12 @@
   const H = 360;
   const STEP = 1 / 120;
 
-  // Coloring pages unlocked after level 5 and level 10.
-  // To use real artwork, drop the files into play/prizes/ and change the file names here.
-  const PRIZES = {
-    5: {file: '/play/prizes/rex-and-billy-coloring-page.svg', name: 'Rex and Billy coloring page', download: 'rex-and-billy-coloring-page.svg'},
-    10: {file: '/play/prizes/doggotron-coloring-page.svg', name: 'Rex the Doggotron coloring page', download: 'doggotron-coloring-page.svg'}
-  };
+  // Coloring-page prizes come from play/prizes/prizes.json, so new pages and packs need no code change.
+  // Only that small list loads with the game; the page pictures load on the prize screen.
+  const PRIZE_DIR = '/play/prizes/';
+  let prizePacks = null, prizeList = null;
+  const loadPrizes = () => prizeList || (prizeList = fetch(PRIZE_DIR + 'prizes.json').then(r => r.json()).then(d => (prizePacks = d.packs || [])).catch(() => { prizeList = null; prizePacks = []; }));
+  const pageFile = (n, thumb) => `${PRIZE_DIR}pages/rex-and-billy-page-${String(n).padStart(2, '0')}${thumb ? '-thumb.jpg' : '.png'}`;
 
   const $ = s => document.querySelector(s);
   const canvas = $('#game');
@@ -878,6 +878,7 @@
   function openOverlay(html) {
     overlay.innerHTML = `<div class="card" role="dialog" aria-modal="true">${html}</div>`;
     overlay.classList.add('show');
+    if (overlay.querySelector('[data-prize]')) fillPrizes();
     const first = overlay.querySelector('[data-primary]') || overlay.querySelector('button, a');
     if (first) setTimeout(() => first.focus({preventScroll: true}), 30);
   }
@@ -924,10 +925,26 @@
       </div>`);
   }
 
+  // A prize box for a level. The page pictures load only here, on the prize screen, never with the game.
   function prizeBlock(n) {
-    const p = PRIZES[n];
-    return `<div class="prize"><img src="${p.file}" alt="${p.name}" width="84" height="108"><div><b>${n === 5 ? 'Your first prize!' : 'Your Doggotron prize!'}</b><br>A ${p.name} to print and color.<br><a class="btn gold" href="${p.file}" download="${p.download}" target="_blank" rel="noopener">Download it</a></div></div>`;
+    return `<div class="prize" data-prize="${n}">Getting your coloring pages...</div>`;
   }
+  function packHtml(p) {
+    const count = p.pages.length;
+    const thumbs = p.pages.map((pg, i) => `<a href="${pageFile(pg)}" download="rex-and-billy-page-${pg}.png" target="_blank" rel="noopener" aria-label="Download coloring page ${i + 1} of ${count}"><img src="${pageFile(pg, true)}" alt="" width="60" height="78" loading="lazy"></a>`).join('');
+    return `<b>${esc(p.title)}</b> The ${esc(p.name)}: ${count} pages to print and color. Tap a page to save it, or get them all at once.<div class="prize-pages">${thumbs}</div><a class="btn gold" href="${PRIZE_DIR}${p.pdf}" download="${p.pdf}" target="_blank" rel="noopener">Download all ${count} (PDF)</a>`;
+  }
+  function fillPrizes() {
+    loadPrizes().then(() => {
+      for (const el of overlay.querySelectorAll('[data-prize]')) {
+        const p = prizePacks.find(q => q.after === +el.dataset.prize);
+        el.innerHTML = p ? packHtml(p) : 'Your coloring pages could not load just now. Try this screen again in a moment.';
+      }
+    });
+  }
+  const esc = t => String(t).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+
+
 
   function showIntro(n) {
     level = n;

@@ -812,7 +812,7 @@
     pauseBtn.hidden = true;
     const cfg = run.cfg;
     let tip = 'Hop over the puddles and the Roombas. Grab the bolts!';
-    if (cfg.theme.key === 'laundry') tip = 'New! Duck under the laundry lines.';
+    if (cfg.theme.key === 'laundry') tip = (cfg.robo ? '' : 'New! ') + 'Duck under the laundry lines.';
     if (cfg.theme.key === 'rooftop') tip = 'Pigeon-drones fly low up here. Duck under them!';
     if (cfg.theme.key === 'park') tip = 'Hop over the roboduckies and flower pots.';
     if (cfg.final) tip = 'Billy is at the end of this street!';

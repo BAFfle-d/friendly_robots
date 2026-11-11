@@ -117,3 +117,4 @@ body{background:#fff;color:var(--ink)}
 .footer .wrap{flex-wrap:wrap}
 .footer .disclosure{flex:1 0 100%;margin:2px 0 0;font-size:12px;font-weight:800}
 .shelf-disclosure{margin:8px 0 0;max-width:460px;font-size:13px;font-weight:800;color:#34499a}
+.play-card{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 14px;max-width:640px;margin:24px auto 0;padding:14px 24px;border-radius:40px;background:#ffcf00;color:#142980;text-decoration:none;font-size:14px;font-weight:900;text-align:center;box-shadow:0 4px 0 #d99900;transition:transform .2s}.play-card:hover{transform:translateY(-3px)}.play-card b{font:500 23px/1.1 Fredoka,'Arial Rounded MT Bold',sans-serif}.play-badge{font-size:10px;letter-spacing:2px;background:#142980;color:#fff;border-radius:20px;padding:3px 9px}@media(max-width:480px){.navlinks>a.nav-play{display:inline}}

@@ -4,3 +4,6 @@ friendly-robots/
 build.cjs
 README.txt
 page.html
+
+# The game self-test runs locally and is not part of the site.
+play/test-engine.cjs

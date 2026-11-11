@@ -237,7 +237,7 @@
       circle(x + m.w / 2, base - m.h * 0.75, m.h * 0.42 + 12, c);
       circle(x + m.w / 2 - 22, base - m.h * 0.55, m.h * 0.28 + 8, c);
       circle(x + m.w / 2 + 24, base - m.h * 0.58, m.h * 0.3 + 8, c);
-      if (m.v > 0.6) { ellipse(x + 10, base - 6, 26, 9, '#7cc4ff'); ellipse(x + 6, base - 12, 5, 4, '#ffd23f'); }
+      if (m.v > 0.6) { circle(x + 4, base - 10, 14, '#4f9f4f'); circle(x + 20, base - 8, 11, '#5cb85c'); }   // a bush (no ground-level water, so it can't look like a puddle)
       return;
     }
     if (key === 'rooftop') {

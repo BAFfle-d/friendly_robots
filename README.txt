@@ -32,7 +32,7 @@ After changing engine.js, run: node play/test-engine.cjs
 That plays every level hundreds of times and fails if a level cannot be cleared
 without bumps, or if a player who never presses anything can still finish.
 The prize coloring pages are b. floore's Rex and Billy art in play/prizes/pages/
-(300 dpi grayscale PNGs plus small thumbnails), with each five-page pack also
+(300 dpi grayscale PNGs plus small thumbnails), with each pack also
 as a PDF in play/prizes/. Board 5 unlocks pack 1, board 10 unlocks pack 2.
 play/prizes/prizes.json says which pages go in which pack, in what order, and after
 which board; the game reads it, so no code changes are needed. To add new pages:
@@ -40,5 +40,7 @@ which board; the game reads it, so no code changes are needed. To add new pages:
 That makes the next numbered pages and thumbnails. Then put the new page numbers in
 prizes.json (or add a pack with its own "after" board and "pdf" name) and rebuild
 the PDFs with: python3 play/prizes/make_prizes.py
+To swap in an updated picture for an existing page, keeping its number:
+  python3 play/prizes/make_prizes.py --set <page number> <image>
 Progress and prizes are saved in the player's own browser (localStorage). The prize
 gate is client-side, so anyone who knows the file address can download the pages.

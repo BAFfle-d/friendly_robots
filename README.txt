@@ -44,3 +44,28 @@ To swap in an updated picture for an existing page, keeping its number:
   python3 play/prizes/make_prizes.py --set <page number> <image>
 Progress and prizes are saved in the player's own browser (localStorage). The prize
 gate is client-side, so anyone who knows the file address can download the pages.
+
+HOLIBOT MATCH (/play/holidays/)
+A five-round matching game for FRIENDLY ROBOTS! Celebrate the Holidays, linked from
+the /play footer. It loads only on its own page. Rounds: 1 holiday things (pictures),
+2 Feliz dresses up (pictures), 3 holiday words, 4 Festiva dresses up (pictures),
+5 holiday people (words only, always). Each round draws 6 of the 9 holidays at random
+(PER_ROUND in data.js). Finishing round 5 unlocks the coloring-page download.
+All wording, colors, icon names and the prize file live in play/holidays/data.js.
+After changing it, run: node play/holidays/test-data.cjs
+
+PICTURES DROP IN BY NAME. Save each as a PNG in play/holidays/img/ with the exact
+name below and commit it. No code changes: a picture that exists replaces its
+placeholder words, and a missing one keeps the words. Transparent or white
+backgrounds work best; the card shows them at about 4:3 (pictures) or square (icons).
+Holiday names in file names: bodhi-day, diwali, kwanzaa, yule, mawlid,
+lunar-new-year, christmas, hanukkah, new-years.
+  icon-<holiday>-1.png      book footer icon, shown on the holiday's name card
+  icon-<holiday>-2.png      the holiday's other icon, shown on the card it matches
+  object-<holiday>.png      round 1 picture (diya, kinara, Yule log...)
+  feliz-<holiday>.png       round 2: Feliz dressed for that holiday
+  festiva-<holiday>.png     round 4: Festiva dressed for that holiday
+  feliz.png, festiva.png    the two robots on the start and between-round screens
+There is no picture for round 5: the Prophet Muhammad is never pictured.
+PRIZE: replace play/holidays/prize/holibot-coloring-page.png with the real page,
+same name. For a PDF instead, change PRIZE.file and PRIZE.download in data.js.

@@ -7,6 +7,7 @@ const vm = require('node:vm');
 const root = __dirname;
 const read = name => fs.readFileSync(path.join(root, name), 'utf8');
 const TAG = 'stashandset-20';
+const SITE = 'https://www.friendlyrobots.online/';
 const AUTHOR_STORE = 'https://www.amazon.com/stores/B.-Floore/author/B0D2DBX9BH';
 
 function amazonUrl(url, tagged) {
@@ -36,9 +37,9 @@ vm.runInNewContext(catalog, context);
 const books = context.window.FRIENDLY_BOOKS;
 const find = id => books.find(book => book.id === id);
 
-assert(books.length === 9, 'Expected all nine books.');
-assert(new Set(books.map(book => book.id)).size === 9, 'Duplicate book ID.');
-assert(new Set(books.map(book => book.url)).size === 9, 'Duplicate book destination.');
+assert(books.length === 10, 'Expected all ten books.');
+assert(new Set(books.map(book => book.id)).size === 10, 'Duplicate book ID.');
+assert(new Set(books.map(book => book.url)).size === 10, 'Duplicate book destination.');
 assert(find('rex').categories.includes('animals') && find('rex').categories.includes('stories'), 'Rex and Billy must appear in both categories.');
 assert(find('usa').categories.includes('community') && find('usa').categories.includes('explore'), 'Travel the USA must appear in both categories.');
 assert(['scifi', 'fantasy'].every(id => find(id).categories.includes('explore')), 'Both imaginative adventures must be in Explore.');
@@ -66,7 +67,7 @@ assert(html.includes('href="styles.css"') && html.includes('src="catalog.js"') &
 assert(html.includes("assets/robotown.webp"), 'Homepage must reference the WebP hero.');
 
 const hrefs = [...html.matchAll(/href="(https:\/\/www\.amazon\.com[^"]*)"/g)].map(match => match[1]);
-assert(hrefs.length === 4, 'Expected four Amazon links in the page HTML (nav, bookshelf, noscript, footer).');
+assert(hrefs.length === 5, 'Expected five Amazon links in the page HTML (nav, holiday feature, bookshelf, noscript, footer).');
 for (const href of hrefs) {
   assert(href === amazonUrl(href, true), 'Amazon link is missing a properly appended tag: ' + href);
   assert(href.includes('rel="sponsored"') || html.includes(`href="${href}" rel="sponsored"`), 'Amazon link must be rel=sponsored: ' + href);
@@ -96,7 +97,7 @@ const data = {
           '@type': 'Book',
           name: book.title,
           author: {'@type': 'Person', name: 'b. floore'},
-          image: book.image,
+          image: new URL(book.image, SITE).href,
           url: cleanUrl,
           identifier: {
             '@type': 'PropertyValue',
@@ -138,7 +139,13 @@ assert(JSON.stringify(locs) === JSON.stringify([
   'https://www.friendlyrobots.online/play'
 ]), 'Sitemap must list the canonical homepage and /play, with no duplicate or asset URLs.');
 assert((sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/g) || []).length === locs.length, 'Each sitemap URL needs a lastmod date.');
-for (const file of ['favicon.svg', 'favicon.ico', 'favicon-32.png', 'apple-touch-icon.png', 'assets/og.jpg', 'assets/robotown.webp', 'assets/robotown.jpg']) {
+const holiday = find('holidays');
+assert(holiday && holiday.featured && html.includes('id="holidays"'), 'Missing the featured holiday book section.');
+assert(html.includes(`href="${holiday.url}" rel="sponsored"`), 'The holiday Get the book button must use the catalog URL.');
+assert(html.includes('src="holidays.js"'), 'The holiday flip-through script is missing.');
+const peekImages = [...html.matchAll(/<img[^>]*class="peek-img"[^>]*>/g)].map(match => match[0]);
+assert(peekImages.length === 4 && peekImages.every(tag => /alt="[^"]{20,}"/.test(tag) && tag.includes('loading="lazy"')), 'The flip-through needs four lazy images with alt text.');
+for (const file of ['favicon.svg', 'favicon.ico', 'favicon-32.png', 'apple-touch-icon.png', 'assets/og.jpg', 'assets/robotown.webp', 'assets/robotown.jpg', 'holidays.js', ...[...html.matchAll(/(?:src|srcset)="(assets\/holidays\/[^" ]+)/g)].map(match => match[1])]) {
   assert(fs.existsSync(path.join(root, file)), 'Missing ' + file);
 }
 const og = fs.readFileSync(path.join(root, 'assets/og.jpg'));
@@ -158,6 +165,6 @@ assert(ogSize && ogSize.width === 1200 && ogSize.height === 630, 'Share image mu
 const fresh = read('index.html');
 const embedded = fresh.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
 const parsed = JSON.parse(embedded[1]);
-assert(parsed['@graph'][1].itemListElement.length === 9, 'JSON-LD ItemList is incomplete.');
+assert(parsed['@graph'][1].itemListElement.length === 10, 'JSON-LD ItemList is incomplete.');
 assert(parsed['@graph'][0].name === 'b. floore', 'JSON-LD author name mismatch.');
-console.log('Homepage ' + Buffer.byteLength(fresh) + ' bytes. JSON-LD parses. Nine books, Associates tag, and share image checked.');
+console.log('Homepage ' + Buffer.byteLength(fresh) + ' bytes. JSON-LD parses. Ten books, Associates tag, and share image checked.');

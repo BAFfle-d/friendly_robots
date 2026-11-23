@@ -1,5 +1,22 @@
 window.FRIENDLY_BOOKS = [
   {
+    "id": "holidays",
+    "title": "The FRIENDLY ROBOTS! Celebrate the Holidays!: A coloring and activity adventure!",
+    "short": "Celebrate the Holidays!",
+    "subtitle": "A coloring and activity adventure!",
+    "category": "community",
+    "badge": "JUST PUBLISHED",
+    "featured": true,
+    "image": "assets/holidays/cover-400.jpg",
+    "url": "https://www.amazon.com/dp/B0HSLJ3PTG?tag=stashandset-20",
+    "color": "#c8202f",
+    "description": "Feliz and Festiva, the HoliBots of RoboTown, have nine holidays to celebrate, and they need a helper. Over 100 pages of coloring, drawing, and activities about how families everywhere celebrate.",
+    "categories": [
+      "community",
+      "explore"
+    ]
+  },
+  {
     "id": "pets",
     "title": "The RoboPets: A FRIENDLY ROBOTS! Coloring and Activity Adventure!",
     "short": "The RoboPets",

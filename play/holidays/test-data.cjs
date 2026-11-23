@@ -42,7 +42,11 @@ const all = JSON.stringify(D);
 for (const [bad, good] of [[/Malwid/i, 'Mawlid'], [/Siddartha/i, 'Siddhartha'], [/Hannukah|Chanukah/i, 'Hanukkah'], [/—/, 'a hyphen, not an em dash']]) {
   if (bad.test(all)) fail(`spelling: use ${good}`);
 }
-if (!fs.existsSync(path.join(__dirname, '..', '..', D.PRIZE.file.replace(/^\//, '')))) fail(`prize file missing: ${D.PRIZE.file}`);
+const root = path.join(__dirname, '..', '..');
+if (!Array.isArray(D.PRIZE.packs) || !D.PRIZE.packs.length) fail('PRIZE.packs needs at least one pack');
+for (const pk of D.PRIZE.packs || []) for (const f of [pk.file, pk.thumb]) {
+  if (!fs.existsSync(path.join(root, f.replace(/^\//, '')))) fail(`prize file missing: ${f}`);
+}
 
 if (fails) { console.error(`${fails} problem(s)`); process.exit(1); }
 console.log(`ok: ${ids.length} holidays, ${D.ROUNDS.length} rounds, ${D.PER_ROUND} per round`);

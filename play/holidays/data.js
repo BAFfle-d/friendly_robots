@@ -7,11 +7,20 @@ window.HoliMatch = {
   // Where the pictures go. Save each one as a PNG with the exact name listed in README.txt.
   IMG_DIR: '/play/holidays/img/',
 
-  // The prize after round 5: the New Year's fireworks coloring page from the Feliz 90 image set.
+  // The prize after round 5: Barry's four coloring packs (PDF, four letter-size pages each).
+  // thumb is page 1 of the pack. Each win on a browser gives the next pack, 1 to 4, then 1 again.
   PRIZE: {
-    file: '/play/holidays/prize/holibot-coloring-page.png',
-    download: 'feliz-and-festiva-coloring-page.png',
-    title: 'Your HoliBot coloring page!'
+    title: 'You won a coloring pack!',
+    packs: [
+      {file: '/play/holidays/prize/feliz-and-festiva-pack-1.pdf', thumb: '/play/holidays/prize/pack-1.png',
+       holidays: 'Bodhi Day, Christmas, Diwali, Hanukkah'},
+      {file: '/play/holidays/prize/feliz-and-festiva-pack-2.pdf', thumb: '/play/holidays/prize/pack-2.png',
+       holidays: 'Mawlid, Lunar New Year, New Year, Yule'},
+      {file: '/play/holidays/prize/feliz-and-festiva-pack-3.pdf', thumb: '/play/holidays/prize/pack-3.png',
+       holidays: 'Christmas, Kwanzaa, Mawlid, Diwali'},
+      {file: '/play/holidays/prize/feliz-and-festiva-pack-4.pdf', thumb: '/play/holidays/prize/pack-4.png',
+       holidays: 'Hanukkah, Lunar New Year, New Year, Bodhi Day'}
+    ]
   },
 
   // The book's nine holidays, in the book's order.

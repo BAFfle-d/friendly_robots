@@ -10,13 +10,15 @@
 
   // ---------- Saved progress (this browser only) ----------
   const SAVE_KEY = 'friendlyrobots.holibotmatch.v1';
-  const blank = () => ({next: 0, done: false, muted: false});
+  // wins: how many times this browser finished round 5. Each win hands out the next prize pack.
+  const blank = () => ({next: 0, done: false, muted: false, wins: 0});
   let save = blank();
   try {
     const raw = localStorage.getItem(SAVE_KEY);
     if (raw) save = Object.assign(blank(), JSON.parse(raw) || {});
   } catch (e) { /* storage blocked: play without saving */ }
   save.next = Math.min(TOTAL, Math.max(0, save.next | 0));
+  save.wins = Math.max(0, save.wins | 0);
   const persist = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify(save)); } catch (e) { /* ignore */ } };
 
   // ---------- Sound: tiny synthesized chimes ----------
@@ -120,11 +122,12 @@
     p.appendChild(el('h2', '', 'HoliBot Match'));
     p.appendChild(bots());
     p.appendChild(el('p', '', 'Help the HoliBots match each holiday to its card. Tap a holiday, then tap the card that goes with it.'));
-    p.appendChild(el('p', '', 'Finish all five rounds to win a coloring page!'));
+    p.appendChild(el('p', '', 'Finish all five rounds to win a pack of coloring pages.'));
+    p.appendChild(callout());
     p.appendChild(dots(save.done ? TOTAL : save.next));
     const act = el('div', 'actions');
     if (save.done) {
-      act.appendChild(button('See my coloring page', 'gold', prizeScreen));
+      act.appendChild(button('See my coloring pack', 'gold', () => prizeScreen(false)));
       act.appendChild(button('Play again', 'plain', () => { save.next = 0; persist(); playRound(0); }));
     } else if (save.next > 0) {
       act.appendChild(button(`Keep going: round ${save.next + 1}`, 'gold', () => playRound(save.next)));
@@ -239,7 +242,7 @@
     sfx.round();
     const last = r === TOTAL - 1;
     save.next = last ? 0 : r + 1;
-    if (last) save.done = true;
+    if (last) { save.done = true; save.wins += 1; }
     persist();
     if (last) { prizeScreen(true); return; }
     const p = el('section', 'panel');
@@ -255,18 +258,39 @@
     show(p);
   }
 
+  function callout(extra) {
+    const c = el('p', 'callout');
+    c.appendChild(el('strong', '', 'FOUR DIFFERENT PRIZES!'));
+    c.appendChild(document.createTextNode(' ' + (extra || 'Every time you win, you unlock the next coloring pack.')));
+    return c;
+  }
+
   function prizeScreen(justWon) {
     const p = el('section', 'panel');
     p.appendChild(el('p', 'eyebrow', justWon ? 'All five rounds!' : 'Your prize'));
     p.appendChild(el('h2', '', D.PRIZE.title));
     p.appendChild(dots(TOTAL));
-    p.appendChild(el('p', '', 'You matched every holiday. Print it out and color it in!'));
+    // Each win on this browser hands out the next pack, 1 to 4, then back to 1,
+    // so brothers and sisters who play separately each get a different prize.
+    const packs = D.PRIZE.packs;
+    const i = (Math.max(1, save.wins) - 1) % packs.length;
+    const pk = packs[i];
+    p.appendChild(el('p', '', `You matched every holiday and won coloring pack ${i + 1}: ${pk.holidays}. Print it out and color it in!`));
     const art = el('img', 'prize-art');
-    art.src = D.PRIZE.file; art.alt = 'Coloring page of Feliz and Festiva';
+    art.src = pk.thumb; art.alt = `First page of coloring pack ${i + 1}`;
     p.appendChild(art);
+    const row = el('ol', 'pack-row');
+    packs.forEach((x, j) => {
+      const li = el('li', j === i ? 'won' : '', `Pack ${j + 1}`);
+      if (j === i) li.setAttribute('aria-current', 'true');
+      row.appendChild(li);
+    });
+    p.appendChild(row);
+    p.appendChild(callout(`Play again to win pack ${(i + 1) % packs.length + 1} next.`));
     const act = el('div', 'actions');
-    const dl = el('a', 'btn gold', 'Download my coloring page');
-    dl.href = D.PRIZE.file; dl.setAttribute('download', D.PRIZE.download);
+    const dl = el('a', 'btn gold', `Download pack ${i + 1}`);
+    dl.href = pk.file; dl.setAttribute('download', pk.file.split('/').pop());
+    dl.setAttribute('aria-label', `Download coloring pack ${i + 1}, a PDF with ${pk.holidays}`);
     act.appendChild(dl);
     act.appendChild(button('Play again', 'plain', () => { save.next = 0; persist(); playRound(0); }));
     p.appendChild(act);

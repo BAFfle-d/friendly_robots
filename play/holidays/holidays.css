@@ -29,7 +29,12 @@ main{flex:1;width:100%;max-width:1000px;margin:0 auto;padding:0 16px 12px}
 .dots li{width:16px;height:16px;border-radius:50%;background:#223f3a26}
 .dots li.done{background:var(--gold);box-shadow:0 0 0 2px var(--gold-edge) inset}
 .dots li.now{background:var(--blue)}
-.prize-art{display:block;margin:12px auto;max-width:260px;width:70%;border-radius:12px;border:1.5px solid #223f3a30;background:#fff}
+.prize-art{display:block;margin:12px auto;max-width:240px;width:62%;aspect-ratio:612/792;object-fit:contain;border-radius:10px;border:1.5px solid #223f3a30;background:#fff}
+.callout{margin:12px auto!important;padding:10px 14px;border-radius:14px;background:#fff3c4;border:2px solid var(--gold-edge);font-weight:800;max-width:440px}
+.callout strong{display:block;font-family:Fredoka,sans-serif;font-weight:600;font-size:22px;letter-spacing:.5px;color:#142980}
+.pack-row{list-style:none;display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin:4px 0;padding:0}
+.pack-row li{padding:4px 12px;border-radius:20px;border:1.5px solid #223f3a30;font-size:14px;font-weight:800;color:var(--muted);background:#fff}
+.pack-row li.won{background:var(--gold);border-color:var(--gold-edge);color:#142980}
 
 /* The board */
 .board.pics{grid-template-columns:1fr 2fr}

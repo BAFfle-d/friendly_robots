@@ -50,7 +50,7 @@ A five-round matching game for FRIENDLY ROBOTS! Celebrate the Holidays, linked f
 the /play footer. It loads only on its own page. Rounds: 1 holiday things (pictures),
 2 Feliz dresses up (pictures), 3 holiday words, 4 Festiva dresses up (pictures),
 5 holiday people (words only, always). Each round draws 6 of the 9 holidays at random
-(PER_ROUND in data.js). Finishing round 5 unlocks the coloring-page download.
+(PER_ROUND in data.js). Finishing round 5 unlocks a coloring pack download.
 All wording, colors, icon names and the prize file live in play/holidays/data.js.
 After changing it, run: node play/holidays/test-data.cjs
 
@@ -67,5 +67,6 @@ lunar-new-year, christmas, hanukkah, new-years.
   festiva-<holiday>.png     round 4: Festiva dressed for that holiday
   feliz.png, festiva.png    the two robots on the start and between-round screens
 There is no picture for round 5: the Prophet Muhammad is never pictured.
-PRIZE: replace play/holidays/prize/holibot-coloring-page.png with the real page,
-same name. For a PDF instead, change PRIZE.file and PRIZE.download in data.js.
+PRIZE: four coloring packs, play/holidays/prize/feliz-and-festiva-pack-1.pdf to -4.pdf,
+each with a page-1 thumbnail pack-1.png to pack-4.png (PRIZE.packs in data.js).
+Each win on a browser hands out the next pack, 1 to 4, then pack 1 again.

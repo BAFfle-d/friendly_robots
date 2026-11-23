@@ -3,13 +3,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#153fd0">
-<title>Rex Runs RoboTown | FRIENDLY ROBOTS!</title>
-<meta name="description" content="Help Rex dash across RoboTown to his best friend, Billy. A free FRIENDLY ROBOTS! game for kids, with ten short levels and coloring pages to win.">
+<title>Play | FRIENDLY ROBOTS!</title>
+<meta name="description" content="Free FRIENDLY ROBOTS! games for kids. Run across RoboTown with Rex, or match the holidays with Feliz and Festiva. Coloring pages to win in both.">
 <link rel="canonical" href="https://www.friendlyrobots.online/play">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="FRIENDLY ROBOTS!">
-<meta property="og:title" content="Rex Runs RoboTown | FRIENDLY ROBOTS!">
-<meta property="og:description" content="Help Rex dash across RoboTown to his best friend, Billy. Ten short levels and coloring pages to win.">
+<meta property="og:title" content="Play | FRIENDLY ROBOTS!">
+<meta property="og:description" content="Free FRIENDLY ROBOTS! games for kids, with coloring pages to win.">
 <meta property="og:url" content="https://www.friendlyrobots.online/play">
 <meta property="og:image" content="https://www.friendlyrobots.online/assets/og.jpg">
 <meta name="twitter:card" content="summary_large_image">
@@ -20,45 +20,54 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/play/play.css">
+<style>
+.hub-intro{text-align:center;margin:10px auto 30px;max-width:620px}
+.hub-intro h2{font-size:clamp(32px,5vw,46px);margin:6px 0 10px;color:var(--blue)}
+.hub-intro p{margin:0;font-size:17px;color:#3c5150}
+.games{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px;margin-bottom:40px}
+.game{background:var(--paper);border-radius:24px;padding:16px 16px 26px;box-shadow:0 10px 30px #16342c1f;display:flex;flex-direction:column;align-items:center;text-align:center}
+.shot{display:block;width:100%;border-radius:16px;overflow:hidden;background:#cfe6ff;aspect-ratio:16/10;transition:transform .25s}
+.shot:hover{transform:translateY(-4px) rotate(-.6deg)}
+.shot img{display:block;width:100%;height:100%;object-fit:cover}
+.game h3{font-size:28px;margin:4px 0 6px;color:var(--blue)}
+.game .eyebrow{margin-top:16px}
+.game p{margin:0 0 20px;max-width:400px;color:#3c5150}
+.gold{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:52px;padding:12px 30px;border-radius:40px;background:var(--gold);color:#142980;text-decoration:none;font-weight:900;font-size:16px;box-shadow:0 4px 0 var(--gold-edge);transition:transform .2s;margin-top:auto}
+.gold:hover{transform:translateY(-3px)}
+.foot{text-align:center;font-size:13px;color:#53656a;padding:10px 16px 26px}
+@media(max-width:720px){.games{grid-template-columns:1fr;gap:22px}.game h3{font-size:25px}}
+@media(prefers-reduced-motion:reduce){.shot,.gold{transition:none}}
+</style>
 </head>
 <body>
 <header class="bar">
   <a class="home" href="/"><span class="robot-logo" aria-hidden="true">&#8226;&#7447;&#8226;</span>FRIENDLY ROBOTS!</a>
-  <h1>Rex Runs RoboTown</h1>
-  <div class="tools">
-    <button type="button" id="sound-toggle" aria-pressed="true">Sound on</button>
-    <button type="button" id="pause-toggle" hidden>Pause</button>
-  </div>
+  <h1>Let&#8217;s play!</h1>
+  <span aria-hidden="true" style="width:120px"></span>
 </header>
 <main>
-  <div class="stage" id="stage">
-    <canvas id="game" role="img" aria-label="Rex the dog running through RoboTown"></canvas>
-    <p class="hint" id="hint" aria-live="polite"></p>
-    <div class="overlay" id="overlay" aria-live="polite"></div>
+  <div class="hub-intro">
+    <div class="eyebrow">Free FRIENDLY ROBOTS! games</div>
+    <h2>Pick a game</h2>
+    <p>Both games are free to play in your browser, and both have coloring pages to win.</p>
   </div>
-  <div class="controls" id="controls" aria-label="Game controls">
-    <button type="button" class="ctl" id="duck-button" aria-label="Duck">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v14m-6-6 6 6 6-6"/></svg>Duck
-    </button>
-    <button type="button" class="ctl shield" id="shield-button" aria-label="Shield" hidden>
-      <span class="charge" id="shield-charge" aria-hidden="true"></span>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 4 6v6c0 5 4 8 8 9 4-1 8-4 8-9V6l-8-3Z"/></svg>Shield
-    </button>
-    <button type="button" class="ctl boost" id="boost-button" aria-label="Boost" hidden>
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c4 3 5 8 3 13H9C7 10 8 5 12 2Zm-2 15 2 5 2-5"/></svg>Boost
-    </button>
-    <button type="button" class="ctl jump" id="jump-button" aria-label="Jump">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V6m-6 6 6-6 6 6"/></svg>Jump
-    </button>
+  <div class="games">
+    <article class="game">
+      <a class="shot" href="/play/rex/" tabindex="-1" aria-hidden="true"><picture><source type="image/webp" srcset="/play/img/rex-480.webp 480w, /play/img/rex-800.webp 800w" sizes="(max-width:720px) 92vw, 470px"><img src="/play/img/rex-800.jpg" width="800" height="500" alt="Rex Runs RoboTown game screen: Rex the black dog runs along a sunny RoboTown sidewalk past shops and tall buildings." decoding="async"></picture></a>
+      <div class="eyebrow">From Rex and Billy</div>
+      <h3>Rex Runs RoboTown</h3>
+      <p>Help Rex dash across the city to his best friend, Billy. Ten short levels, with coloring pages to win.</p>
+      <a class="gold" href="/play/rex/">Play Rex Runs RoboTown <span aria-hidden="true">&#8594;</span></a>
+    </article>
+    <article class="game">
+      <a class="shot" href="/play/holidays/" tabindex="-1" aria-hidden="true"><picture><source type="image/webp" srcset="/play/img/holibot-480.webp 480w, /play/img/holibot-800.webp 800w" sizes="(max-width:720px) 92vw, 470px"><img src="/play/img/holibot-800.jpg" width="800" height="500" alt="HoliBot Match game screen: holiday names like Kwanzaa and Yule on one side, pictures like a kinara and a decorated tree on the other." decoding="async"></picture></a>
+      <div class="eyebrow">From Celebrate the Holidays!</div>
+      <h3>HoliBot Match</h3>
+      <p>Match the holidays with Feliz and Festiva. Five quick rounds, with four different coloring packs to win.</p>
+      <a class="gold" href="/play/holidays/">Play HoliBot Match <span aria-hidden="true">&#8594;</span></a>
+    </article>
   </div>
-  <p class="keys">Tap the city to jump, or swipe down to duck. On a keyboard: <kbd>Space</kbd> jumps, <kbd>&#8595;</kbd> ducks (and drops off a platform), <kbd>E</kbd> is the shield, <kbd>R</kbd> or <kbd>&#8594;</kbd> boosts once you've caught it, <kbd>P</kbd> pauses.</p>
-  <noscript><p class="keys">Rex Runs RoboTown needs JavaScript turned on to play.</p></noscript>
 </main>
-<footer class="foot">
-  <p>Rex and Billy are best friends from <a href="/#new">Rex and Billy: a FRIENDLY ROBOTS! story</a> by b. floore.</p>
-  <p>More to play: <a href="/play/holidays/">HoliBot Match with Feliz and Festiva</a></p>
-</footer>
-<script src="/play/engine.js"></script>
-<script src="/play/game.js"></script>
+<footer class="foot"><p>Games from the FRIENDLY ROBOTS! books by b. floore. <a href="/#books">See the books</a></p></footer>
 </body>
 </html>

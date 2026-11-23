@@ -132,12 +132,19 @@ const robots = read('robots.txt');
 const sitemap = read('sitemap.xml');
 assert(robots.includes('Allow: /') && robots.includes('Sitemap: https://www.friendlyrobots.online/sitemap.xml'), 'robots.txt must allow crawling and point at the sitemap.');
 assert(!/^Disallow:\s*\/(?:play\b.*)?\s*$/im.test(robots), 'robots.txt must not block /play.');
-assert(!/noindex/i.test(read('play/index.html')), '/play must not be noindex.');
+for (const page of ['play/index.html', 'play/rex/index.html', 'play/holidays/index.html']) assert(!/noindex/i.test(read(page)), page + ' must not be noindex.');
+const hub = read('play/index.html');
+assert(hub.includes('href="/play/rex/"') && hub.includes('href="/play/holidays/"'), 'The /play page must link to both games.');
+assert([...hub.matchAll(/<img [^>]*alt="[^"]{20,}"/g)].length === 2, 'Each game card on /play needs a screenshot with alt text.');
+assert(html.includes('class="nav-play" href="/play"'), 'The top Play link must go to the /play page.');
+assert(html.includes('href="/play/rex/"') && html.includes('href="/play/holidays/"'), 'The homepage must link to both games.');
 const locs = [...sitemap.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)].map(match => match[1]);
 assert(JSON.stringify(locs) === JSON.stringify([
   'https://www.friendlyrobots.online/',
-  'https://www.friendlyrobots.online/play'
-]), 'Sitemap must list the canonical homepage and /play, with no duplicate or asset URLs.');
+  'https://www.friendlyrobots.online/play',
+  'https://www.friendlyrobots.online/play/rex/',
+  'https://www.friendlyrobots.online/play/holidays/'
+]), 'Sitemap must list the homepage, /play and both games, with no duplicate or asset URLs.');
 assert((sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/g) || []).length === locs.length, 'Each sitemap URL needs a lastmod date.');
 const holiday = find('holidays');
 assert(holiday && holiday.featured && html.includes('id="holidays"'), 'Missing the featured holiday book section.');

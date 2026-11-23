@@ -21,8 +21,14 @@ Book JSON-LD url stays the clean dp URL. offers.url carries the tag.
 NOT UPLOADED
 .vercelignore keeps build.cjs and this README off the public site.
 
-GAME (/play)
-Rex Runs RoboTown lives in play/ and loads only on /play, so the homepage stays light.
+PLAY PAGE (/play)
+play/index.html is the games page: one card per game, each with a screenshot from
+play/img/ (WebP plus a JPG fallback, 16:10) and a gold Play button. The homepage's
+top Play link goes here. To add a game, add a card and its two screenshots.
+
+GAME (/play/rex/)
+Rex Runs RoboTown's page is play/rex/index.html; its code and prizes stay in play/
+and load only on /play/rex/, so the homepage stays light.
 play/engine.js holds the rules: speeds, level lengths, time limits, the shield and
 the obstacle layouts. play/game.js draws everything and handles controls and screens.
 Tuning lives at the top of engine.js: ALLOWED_BUMPS (bumps each board allows before
@@ -47,7 +53,7 @@ gate is client-side, so anyone who knows the file address can download the pages
 
 HOLIBOT MATCH (/play/holidays/)
 A five-round matching game for FRIENDLY ROBOTS! Celebrate the Holidays, linked from
-the /play footer. It loads only on its own page. Rounds: 1 holiday things (pictures),
+the /play page and the holiday book section on the homepage. It loads only on its own page. Rounds: 1 holiday things (pictures),
 2 Feliz dresses up (pictures), 3 holiday words, 4 Festiva dresses up (pictures),
 5 holiday people (words only, always). Each round draws 6 of the 9 holidays at random
 (PER_ROUND in data.js). Finishing round 5 unlocks a coloring pack download.

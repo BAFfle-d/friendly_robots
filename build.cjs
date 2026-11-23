@@ -130,7 +130,14 @@ fs.writeFileSync(path.join(root, 'index.html'), html);
 const robots = read('robots.txt');
 const sitemap = read('sitemap.xml');
 assert(robots.includes('Allow: /') && robots.includes('Sitemap: https://www.friendlyrobots.online/sitemap.xml'), 'robots.txt must allow crawling and point at the sitemap.');
-assert(sitemap.includes('<loc>https://www.friendlyrobots.online/</loc>') && !/index\.html|page\.html|friendly-robots/.test(sitemap), 'Sitemap must list only the canonical homepage.');
+assert(!/^Disallow:\s*\/(?:play\b.*)?\s*$/im.test(robots), 'robots.txt must not block /play.');
+assert(!/noindex/i.test(read('play/index.html')), '/play must not be noindex.');
+const locs = [...sitemap.matchAll(/<loc>\s*([^<]+?)\s*<\/loc>/g)].map(match => match[1]);
+assert(JSON.stringify(locs) === JSON.stringify([
+  'https://www.friendlyrobots.online/',
+  'https://www.friendlyrobots.online/play'
+]), 'Sitemap must list the canonical homepage and /play, with no duplicate or asset URLs.');
+assert((sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/g) || []).length === locs.length, 'Each sitemap URL needs a lastmod date.');
 for (const file of ['favicon.svg', 'favicon.ico', 'favicon-32.png', 'apple-touch-icon.png', 'assets/og.jpg', 'assets/robotown.webp', 'assets/robotown.jpg']) {
   assert(fs.existsSync(path.join(root, file)), 'Missing ' + file);
 }

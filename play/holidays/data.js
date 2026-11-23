@@ -7,7 +7,7 @@ window.HoliMatch = {
   // Where the pictures go. Save each one as a PNG with the exact name listed in README.txt.
   IMG_DIR: '/play/holidays/img/',
 
-  // The prize after round 5. Swap in the real page with the same file name.
+  // The prize after round 5: the New Year's fireworks coloring page from the Feliz 90 image set.
   PRIZE: {
     file: '/play/holidays/prize/holibot-coloring-page.png',
     download: 'feliz-and-festiva-coloring-page.png',
@@ -17,17 +17,17 @@ window.HoliMatch = {
   // The book's nine holidays, in the book's order.
   // icons: the two footer icons from the book. The first goes on the holiday's name card,
   // the second on the card it matches, so kids get a visual link without matching the same picture.
-  // The names are placeholders until the real icons arrive; the files are named by holiday, not by icon.
+  // The names say which symbol from Barry's image set is in each file; the files are named by holiday, not by icon.
   HOLIDAYS: [
-    {id: 'bodhi-day', name: 'Bodhi Day', color: '#2f8f5b', icons: ['bodhi leaf', 'lotus']},
-    {id: 'diwali', name: 'Diwali', color: '#e0791a', icons: ['diya', 'rangoli']},
-    {id: 'kwanzaa', name: 'Kwanzaa', color: '#1f7a3a', icons: ['kinara', 'ear of corn']},
-    {id: 'yule', name: 'Yule', color: '#5b6b2e', icons: ['pine branch', 'sun']},
-    {id: 'mawlid', name: 'Mawlid', color: '#127a74', icons: ['crescent moon', 'star']},
-    {id: 'lunar-new-year', name: 'Lunar New Year', color: '#c4232b', icons: ['lantern', 'dragon']},
-    {id: 'christmas', name: 'Christmas', color: '#b3262e', icons: ['ornament', 'candy cane']},
-    {id: 'hanukkah', name: 'Hanukkah', color: '#1f5fb8', icons: ['menorah', 'dreidel']},
-    {id: 'new-years', name: "New Year's", color: '#6b3fb3', icons: ['party hat', 'clock']}
+    {id: 'bodhi-day', name: 'Bodhi Day', color: '#2f8f5b', icons: ['lotus', 'dharma wheel']},
+    {id: 'diwali', name: 'Diwali', color: '#e0791a', icons: ['rangoli', 'string of diyas']},
+    {id: 'kwanzaa', name: 'Kwanzaa', color: '#1f7a3a', icons: ['unity cup', 'harvest basket']},
+    {id: 'yule', name: 'Yule', color: '#5b6b2e', icons: ['wheel of the year', 'straw goat']},
+    {id: 'mawlid', name: 'Mawlid', color: '#127a74', icons: ['mosque', 'string of lanterns']},
+    {id: 'lunar-new-year', name: 'Lunar New Year', color: '#c4232b', icons: ['red lantern', 'dragon']},
+    {id: 'christmas', name: 'Christmas', color: '#b3262e', icons: ['ornament', 'sleigh with gifts']},
+    {id: 'hanukkah', name: 'Hanukkah', color: '#1f5fb8', icons: ['dreidel', 'gelt']},
+    {id: 'new-years', name: "New Year's", color: '#6b3fb3', icons: ['party horn', 'twelve grapes']}
   ],
 
   // The five rounds. kind 'picture' cards show img/<prefix>-<holiday id>.png once it exists,
@@ -43,9 +43,9 @@ window.HoliMatch = {
         'diwali': {text: 'Diya lamps', note: 'Diyas are little lamps. Their light celebrates goodness and knowledge.'},
         'kwanzaa': {text: 'Kinara', note: 'The kinara holds seven candles, one for each Kwanzaa principle.'},
         'yule': {text: 'Yule log', note: 'Long ago, a Yule log was burned in the fireplace.'},
-        'mawlid': {text: 'Nut and sesame sweets', note: 'In Egypt, these Mawlid sweets are called Halawet al-Mawlid.'},
+        'mawlid': {text: 'Tray of sweets', note: 'In Egypt, these Mawlid sweets are called Halawet al-Mawlid.'},
         'lunar-new-year': {text: 'Red envelope', note: 'Red stands for happiness and good fortune.'},
-        'christmas': {text: 'Star', note: 'Many families put a star on top of the Christmas tree.'},
+        'christmas': {text: 'Decorated tree', note: 'Many families decorate an evergreen tree for Christmas.'},
         'hanukkah': {text: 'Menorah', note: 'Eight candles for eight nights, plus a helper candle called the shamash.'},
         'new-years': {text: 'Clock at midnight', note: 'The whole world counts down to welcome the new year!'}
       }
@@ -56,13 +56,13 @@ window.HoliMatch = {
       kind: 'picture', prefix: 'feliz',
       cards: {
         'bodhi-day': {text: 'Feliz sitting still to meditate'},
-        'diwali': {text: 'Feliz in a new kurta'},
-        'kwanzaa': {text: 'Feliz in a dashiki'},
-        'yule': {text: 'Feliz in a winter cloak with a sun badge'},
-        'mawlid': {text: 'Feliz in a long white thobe'},
-        'lunar-new-year': {text: 'Feliz in a red silk jacket'},
-        'christmas': {text: 'Feliz in a Santa suit'},
-        'hanukkah': {text: 'Feliz in a kippah and blue scarf'},
+        'diwali': {text: 'Feliz with a flower garland'},
+        'kwanzaa': {text: 'Feliz with a unity cup'},
+        'yule': {text: 'Feliz with evergreen and holly'},
+        'mawlid': {text: 'Feliz with a lantern'},
+        'lunar-new-year': {text: 'Feliz with an orange and a fan'},
+        'christmas': {text: 'Feliz in a Santa hat'},
+        'hanukkah': {text: 'Feliz with a menorah'},
         'new-years': {text: 'Feliz in a party hat'}
       }
     },
@@ -87,15 +87,15 @@ window.HoliMatch = {
       ask: 'Which holiday is Festiva ready for?',
       kind: 'picture', prefix: 'festiva',
       cards: {
-        'bodhi-day': {text: 'Festiva holding a lotus flower'},
-        'diwali': {text: 'Festiva in a sari'},
-        'kwanzaa': {text: 'Festiva in a kente head wrap'},
-        'yule': {text: 'Festiva in an evergreen crown'},
-        'mawlid': {text: 'Festiva in a headscarf'},
-        'lunar-new-year': {text: 'Festiva in a red qipao'},
-        'christmas': {text: 'Festiva in an elf hat'},
-        'hanukkah': {text: 'Festiva in a blue-and-white sweater'},
-        'new-years': {text: 'Festiva in a sparkly party dress'}
+        'bodhi-day': {text: 'Festiva with a bodhi leaf'},
+        'diwali': {text: 'Festiva with a diya lamp'},
+        'kwanzaa': {text: 'Festiva sharing the unity cup'},
+        'yule': {text: 'Festiva hugging a Yule log'},
+        'mawlid': {text: 'Festiva with a lantern and a moon'},
+        'lunar-new-year': {text: 'Festiva with a dragon puppet'},
+        'christmas': {text: 'Festiva in a Santa suit'},
+        'hanukkah': {text: 'Festiva with a jelly doughnut'},
+        'new-years': {text: 'Festiva with a party horn'}
       }
     },
     {

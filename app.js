@@ -9,18 +9,17 @@
   };
   const esc = text => String(text).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
   const cover = (book,lazy=true) => `<img src="${esc(book.image)}" alt="${esc(book.title)} - book cover" ${lazy?'loading="lazy"':''}>`;
-  document.querySelector('#new-grid').innerHTML = books.filter(book => !book.featured).slice(0,2).map(book => `<article class="new-book" style="--book-color:${book.color}"><button class="new-cover" data-book="${book.id}" aria-label="Take a peek at ${esc(book.title)}">${cover(book)}</button><div class="new-copy"><span class="tag">${book.badge}</span><h3>${esc(book.short)}</h3><p class="subtitle">${esc(book.subtitle)}</p><p class="description">${esc(book.description)}</p><button class="text-button" data-book="${book.id}">Take a peek &#8599;</button></div></article>`).join('');
-  document.querySelector('#book-grid').innerHTML = books.map(book => `<article class="book-card" data-categories="${book.categories.join(' ')}"><button class="book-image" style="--book-color:${book.color}" data-book="${book.id}" aria-label="Take a peek at ${esc(book.title)}">${cover(book)}</button><span class="book-category">${book.categories.map(c=>esc(categories[c])).join(' &middot; ')}</span><h3><button data-book="${book.id}">${esc(book.short)}</button></h3><p class="subtitle">${esc(book.subtitle)}</p></article>`).join('');
   const dialog=document.querySelector('#book-dialog');
   let opener=null;
   document.addEventListener('click',event=>{
+    if(event.target.closest('a'))return;
     const target=event.target.closest('[data-book],[data-place]');
     if(!target)return;
     opener=target;
     const content=document.querySelector('#dialog-content');
     if(target.dataset.book){
       const book=byId.get(target.dataset.book);if(!book)return;
-      content.innerHTML=`<div class="dialog-layout" style="--book-color:${book.color}"><div class="dialog-art">${cover(book,false)}</div><div class="dialog-copy"><span class="tag">${book.categories.map(c=>esc(categories[c])).join(' &middot; ')}</span><h2 id="dialog-title">${esc(book.title)}</h2><p>${esc(book.description)}</p><a class="button" href="${esc(book.url)}" target="_blank" rel="noopener sponsored">Find this book on Amazon &#8599;</a><small>Opens Amazon in a new tab. Ask a grown-up to join you. As an Amazon Associate I earn from qualifying purchases.</small></div></div>`;
+      content.innerHTML=`<div class="dialog-layout" style="--book-color:${book.color}"><div class="dialog-art">${cover(book,false)}</div><div class="dialog-copy"><span class="tag">${book.categories.map(c=>esc(categories[c])).join(' &middot; ')}</span><h2 id="dialog-title">${esc(book.title)}</h2><p>${esc(book.description)}</p><p class="dialog-more"><a href="/books/${esc(book.slug)}/">About this book</a></p><a class="button" href="${esc(book.url)}" target="_blank" rel="noopener sponsored">Find this book on Amazon &#8599;</a><small>Opens Amazon in a new tab. Ask a grown-up to join you. As an Amazon Associate I earn from qualifying purchases.</small></div></div>`;
     }else{
       const place=places[target.dataset.place];if(!place)return;
       const symbols={tower:'&#8962;',duck:'&#129414;',park:'&#10047;'};

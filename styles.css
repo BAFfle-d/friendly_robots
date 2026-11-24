@@ -154,3 +154,12 @@ body{background:#fff;color:var(--ink)}
 @media(max-width:600px){.peek-head{flex-direction:column;align-items:start}.peek-track{gap:16px}.holiday-copy .holiday-lede{font-size:17px}.holiday-cover{max-width:240px}}
 @media(prefers-reduced-motion:reduce){.peek-track{scroll-behavior:auto}.peek-slide,.peek-slide:nth-child(even){transform:none}}
 .holiday-play{margin-top:40px}
+.holiday-page{color:#fff;font-size:14px;font-weight:900;text-underline-offset:4px}
+.holiday-page:hover{color:#ffd84a}
+.book-card h3 a,.new-copy h3 a{color:inherit;text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px}
+.book-card .page-link{margin:8px 0 0;font-size:13px;font-weight:900}
+.book-card .page-link a{color:#b91058;text-underline-offset:4px}
+.new-actions{margin-top:auto;display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.new-actions .text-button{margin-top:0}
+.dialog-more{margin:14px 0 0}
+.dialog-more a{font-size:13px;font-weight:900;color:#b91058;text-underline-offset:4px}

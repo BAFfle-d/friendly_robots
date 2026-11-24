@@ -10,8 +10,21 @@ assets/robotown.webp is the hero image. assets/robotown.jpg is the fallback.
 assets/og.jpg is the 1200x630 share image.
 
 After changing a book in catalog.js, run: node build.cjs
-That refreshes the Book JSON-LD in index.html and checks links, categories,
-and required copy. Commit the updated index.html. Vercel does not run the script.
+That refreshes the Book JSON-LD in index.html, rewrites the homepage book
+cards, writes each /books/<slug>/ page, updates sitemap.xml, and checks links,
+categories, and required copy. Commit the updated files. Vercel does not run
+the script.
+
+BOOK PAGES (/books/<slug>/)
+Each catalog book has its own page: title, cover, author, the short description
+already in catalog.js, the paperback price when one is recorded, and the
+Amazon buy link. Slugs, prices, currency, availability, and format live in
+catalog.js. Prices are the paperback buy-box amounts from the Amazon listing
+that catalog.js already links, in USD. If a price cannot be verified, leave
+price, priceCurrency, availability, and format off that book. The page then
+hides the price and omits offers.price. Do not invent a price, a rating, or a
+review. Book JSON-LD on the homepage points at these pages. offers.url on both
+the homepage and the book page stays the tagged Amazon link.
 
 AMAZON
 Product and author-store links use tag=stashandset-20, the Associates tracking
